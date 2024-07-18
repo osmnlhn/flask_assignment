@@ -1,12 +1,13 @@
 # Import libraries
 from flask import Flask, redirect, request, render_template, url_for
-from models import Transaction 
-from sqlalchemy import and_
+
+
 
 
 
 # Instantiate Flask functionality
 app = Flask(__name__)
+
 
 
 # Sample data
@@ -19,6 +20,7 @@ transactions = [
 # Read operation
 @app.route("/")
 def get_transactions():
+    
     return render_template("transactions.html", transactions=transactions)
 
 # Create operation
@@ -76,27 +78,26 @@ def delete_transaction(transaction_id):
     return redirect(url_for("get_transactions"))
 
 #Search Transactions
-@app.route('/search', methods=['GET', 'POST'])
+@app.route("/search", methods=['GET', 'POST'])
 def search_transactions():
     if request.method == 'POST':
-       
-        min_amount = request.form.get('min_amount')
-        max_amount = request.form.get('max_amount')
-
-       
+        
+        min_amount = float(request.form['min_amount'])
+        max_amount = float(request.form['max_amount'])
         
         
-        transactions = Transaction.query.all()
-
-        filtered_transactions = [transaction for transaction in transactions if min_amount <= transaction.amount <= max_amount]
-
+        filtered_transactions = [
+            transaction for transaction in transactions
+            if min_amount <= transaction['amount'] <= max_amount
+        ]
+        
+       
         return render_template('transactions.html', transactions=filtered_transactions)
+    
 
-    elif request.method == 'GET':
-
-        return render_template('search.html')
+    return render_template('search.html')
+        
 
 # Run the Flask app
 if __name__ == "__main__":
     app.run(debug=True)
-    
